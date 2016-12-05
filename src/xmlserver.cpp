@@ -147,6 +147,26 @@ void XmlUnixServer::exportXml(ticpp::Element* pConfig)
     pConfig->SetAttribute("path", path_m);
 }
 
+// Stefaan
+void XmlServer::removeAllNotifications ()
+{
+    std::list<ClientConnection*>::iterator it;
+    for (it = connections_m.begin(); it != connections_m.end(); it++)
+    {        
+        (*it)->removeNotifications();
+    }
+}
+
+void XmlServer::resetAllNotifications ()
+{
+    std::list<ClientConnection*>::iterator it;
+    for (it = connections_m.begin(); it != connections_m.end(); it++)
+    {
+        (*it)->resetNotifications();
+    }
+}
+// -- end Stefaan
+
 void XmlServer::Run (pth_sem_t *stop1)
 {
     pth_event_t stop = pth_event (PTH_EVENT_SEM, stop1);
@@ -183,6 +203,35 @@ ClientConnection::~ClientConnection ()
         server_m->deregister (this);
     close (fd_m);
 }
+
+// Stefaan
+void ClientConnection::removeNotifications ()
+{    
+    NotifyList_t::iterator it;
+    for (it = notifyList_m.begin(); it != notifyList_m.end(); it++)
+    {
+        (*it)->removeChangeListener(this);
+        (*it)->decRefCount(); 
+    }
+    setShouldResetNotifications(notifyList_m.size() > 0);
+    notifyList_m.clear();
+}
+
+void ClientConnection::resetNotifications ()
+{   
+    if (shouldResetNotifications()) {
+        infoStream("XmlServer") << "Resetting all notifications for client" << endlog;
+        std::list<Object*> objList = ObjectController::instance()->getObjects();
+        std::list<Object*>::iterator it;
+        for (it=objList.begin(); it != objList.end(); it++)
+        {
+            notifyList_m.push_back((*it));
+            (*it)->addChangeListener(this);
+        }    
+        setShouldResetNotifications(false);
+    }    
+}
+// -- end Stefaan
 
 void ClientConnection::Run (pth_sem_t * stop1)
 {
@@ -279,6 +328,25 @@ void ClientConnection::Run (pth_sem_t * stop1)
                     pMsg->SetAttribute("status", "success");
                     sendmessage (doc.GetAsString(), stop);
                 }
+                // Stefaan
+                // will return initialized=true if all objects have been assigned a value
+                // false otherwise
+                else if (pRead->Value() == "initialized")
+                {
+                    std::list<Object*> objList = ObjectController::instance()->getObjects();
+                    std::list<Object*>::iterator it;
+                    bool isInitialised = true;
+                    for (it=objList.begin(); it != objList.end(); it++)
+                    {                            
+                        isInitialised = isInitialised && (*it)->isInitialised();
+                    }
+                    ticpp::Element value("value");
+                    value.SetText(isInitialised);
+                    pRead->LinkEndChild(&value);                    
+                    pMsg->SetAttribute("status", "success");
+                    sendmessage (doc.GetAsString(), stop);                    
+                }
+                // end Stefaan
                 else if (pRead->Value() == "status")
                 {
                     ticpp::Element* pConfig = pRead->FirstChildElement(false);
@@ -439,9 +507,36 @@ void ClientConnection::Run (pth_sem_t * stop1)
                     {
                         ticpp::Iterator< ticpp::Element > pConfigItem;
                         for ( pConfigItem = pWrite->FirstChildElement(); pConfigItem != pConfigItem.end(); pConfigItem++ )
-                        {
-                            if (pConfigItem->Value() == "objects")
-                                ObjectController::instance()->importXml(&(*pConfigItem));
+                        {                            
+                            if (pConfigItem->Value() == "objects") {
+                                int resetNotification = 0;
+                                pWrite->GetAttributeOrDefault("reset_notifications", &resetNotification, 0);
+                                if (resetNotification > 0)
+                                    {                                
+                                    // Stefaan
+                                    // Unregister *all* listening clients and notify them
+                                    // This will make it possible to delete objects without first asking all clients to 
+                                    // call "deregisterall".
+                                    // The clients will be notified, so that they can call "registerall" again after 1 second delay or so
+                                    if (server_m)
+                                        server_m->removeAllNotifications();
+
+                                    try {                                    
+                                        ObjectController::instance()->importXml(&(*pConfigItem));
+                                    } catch(...) {
+                                        if (server_m)                                         
+                                        server_m->resetAllNotifications();
+                                        throw;
+                                    }
+                                    
+                                    if (server_m)                                         
+                                        server_m->resetAllNotifications();
+                                } else {
+                                    ObjectController::instance()->importXml(&(*pConfigItem));
+                                }
+                                // -- end Stefaan
+                                // original was simply this one line:  ObjectController::instance()->importXml(&(*pConfigItem)); 
+                            }                            
                             else if (pConfigItem->Value() == "rules")
                                 RuleServer::instance()->importXml(&(*pConfigItem));
                             else if (pConfigItem->Value() == "services")

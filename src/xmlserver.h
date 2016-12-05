@@ -43,6 +43,10 @@ public:
     virtual void exportXml(ticpp::Element* pConfig) = 0;
 
     bool deregister (ClientConnection *con);
+    // Stefaan: removes all notifications for all connected clients
+    void removeAllNotifications ();
+    // Stefaan: resets all notifications for connected clients that had notifications before 'removeNotifications' was called on them
+    void resetAllNotifications ();
 protected:
     int fd_m;
 private:
@@ -85,6 +89,14 @@ public:
     int sendmessage (int size, const char * msg, pth_event_t stop);
     int sendmessage (std::string msg, pth_event_t stop);
     int sendreject (const char* msgstr, const std::string& type, pth_event_t stop);
+    // Stefaan: removes all notifications
+    void removeNotifications ();
+    // Stefaan: adds objects to this client for notifications
+    void resetNotifications ();
+    // Stefaan
+    bool shouldResetNotifications() {return shouldResetNotifications_m;};
+    void setShouldResetNotifications(bool t) {shouldResetNotifications_m = t;};
+
 
     virtual void onChange(Object* object);
 
@@ -96,6 +108,8 @@ private:
 
     typedef std::list<Object*> NotifyList_t;
     NotifyList_t notifyList_m;
+    // Stefaan
+    bool shouldResetNotifications_m;
 
     void Run (pth_sem_t * stop);
 };

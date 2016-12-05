@@ -89,6 +89,8 @@ public:
     virtual void onUpdate();
     void onInternalUpdate();
     bool forceUpdate() { return (!init_m || (flags_m & Stateless)); };
+    // Stefaan
+    bool isInitialised() { return init_m; };
     void addChangeListener(ChangeListener* listener);
     void removeChangeListener(ChangeListener* listener);
     void onWrite(const uint8_t* buf, int len, eibaddr_t src);
