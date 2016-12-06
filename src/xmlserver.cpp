@@ -196,7 +196,7 @@ ClientConnection::~ClientConnection ()
     for (it = notifyList_m.begin(); it != notifyList_m.end(); it++)
     {
         (*it)->removeChangeListener(this);
-        (*it)->decRefCount();
+        (*it)->decRefCount();        
     }
     notifyList_m.clear();
     if (server_m)
@@ -210,8 +210,8 @@ void ClientConnection::removeNotifications ()
     NotifyList_t::iterator it;
     for (it = notifyList_m.begin(); it != notifyList_m.end(); it++)
     {
-        (*it)->removeChangeListener(this);
-        (*it)->decRefCount(); 
+        (*it)->removeChangeListener(this);        
+        (*it)->decRefCount();
     }
     setShouldResetNotifications(notifyList_m.size() > 0);
     notifyList_m.clear();
@@ -226,7 +226,7 @@ void ClientConnection::resetNotifications ()
         for (it=objList.begin(); it != objList.end(); it++)
         {
             notifyList_m.push_back((*it));
-            (*it)->addChangeListener(this);
+            (*it)->addChangeListener(this);            
         }    
         setShouldResetNotifications(false);
     }    
@@ -339,6 +339,7 @@ void ClientConnection::Run (pth_sem_t * stop1)
                     for (it=objList.begin(); it != objList.end(); it++)
                     {                            
                         isInitialised = isInitialised && (*it)->isInitialised();
+                        (*it)->decRefCount();
                     }
                     ticpp::Element value("value");
                     value.SetText(isInitialised);
