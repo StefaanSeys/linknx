@@ -1,8 +1,24 @@
-This repository is a migration of the legacy one hosted on Sourceforge
-(:pserver:anonymous@linknx.cvs.sourceforge.net:/cvsroot/linknx)
+This repository was cloned from the master branch of the original linknx repository on github on December 5, 2016.
 
-The migration is aimed at simplifying the collaboration and maintenance of
-Linknx's source code in the future.
+Features added in this version (v0.0.1.34STS):
+
+- Request whether all objects have been initialized:
+
+```
+echo -ne '<read><initialized/></read>\x04' | netcat localhost 1030
+
+<read status="success">
+        <initialized>
+                <value>1</value>
+        </initialized>
+</read>
+```
+
+- Make object deletion easier by allowing automatic stopping and re-enabling of notification listeners:
+
+```
+<write><config reset_notifications=1><objects><object id="bla" delete="true"/></objects></config></write>
+```
 
 # Documentation
 Read the [wiki pages](https://sourceforge.net/p/linknx/wiki/Main_Page/) on sourceforge.
