@@ -690,6 +690,10 @@ void ClientConnection::Run (pth_sem_t * stop1)
                                     }
                                 }
                             }
+                            else if (pObjects->Value() == "buslistener")
+                            {
+                                ObjectController::instance()->addBusListener(this);
+                            }
                             else
                                 throw "Unknown objects element";
                         }

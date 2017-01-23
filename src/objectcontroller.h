@@ -37,7 +37,7 @@ class Object;
 class BusListener
 {
 public:
-    virtual ~BusListener() {}:
+    virtual ~BusListener() {};
     virtual void onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len) = 0;
 };
 
