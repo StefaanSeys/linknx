@@ -561,11 +561,11 @@ std::string Object::WriteAddr(eibaddr_t addr)
 }
 
 //Stefaan
-std::string WriteRawValue(const uint8_t* buf, int len)
+std::string Object::WriteRawValue(const uint8_t* buf, int len)
 {
     std::stringstream stream;
     for (int i = 0; i < len; ++i)
-        stream << std::hex << std::setfill('0') << std::setw(2) << buf[i] << " ";
+        stream << std::hex << std::setfill('0') << std::setw(2) << (int)buf[i] << " ";
     return stream.str();
 }
 

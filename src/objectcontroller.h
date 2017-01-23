@@ -119,7 +119,7 @@ public:
     static std::string WriteGroupAddr(eibaddr_t addr);
     static std::string WriteAddr(eibaddr_t addr);
     // Stefaan
-    static std::string WriteRawValue(const uint8_t* buf);
+    static std::string WriteRawValue(const uint8_t* buf, int len);
 
 protected:
     virtual bool set(ObjectValue* value) = 0;
