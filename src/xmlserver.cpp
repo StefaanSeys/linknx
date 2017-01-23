@@ -803,6 +803,6 @@ void ClientConnection::onChange(Object* object)
 
 void ClientConnection::onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
 {
-    infoStream("ClientConnection::onMessage") << "Buslistener Called! msg length: " << len;    
+    infoStream("ClientConnection::onMessage") << "Buslistener Called! From: " << Object::WriteAddr(src) << " To: " << Object::WriteGroupAddr(dest) << " Value: " << Object::WriteRawValue(buf, len);    
 }
 

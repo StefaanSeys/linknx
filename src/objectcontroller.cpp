@@ -23,6 +23,7 @@
 #include <cmath>
 #include <cassert>
 #include <iomanip>
+#include <sstream> // added by Stefaan
 #include <iconv.h>
 
 ObjectController* ObjectController::instance_m;
@@ -557,6 +558,15 @@ std::string Object::WriteAddr(eibaddr_t addr)
     char writeaddr_buf[16];
     sprintf (writeaddr_buf, "%d.%d.%d", (addr >> 12) & 0x0f, (addr >> 8) & 0x0f, (addr) & 0xff);
     return std::string(writeaddr_buf);
+}
+
+//Stefaan
+std::string WriteRawValue(const uint8_t* buf, int len)
+{
+    std::stringstream stream;
+    for (int i = 0; i < len; ++i)
+        stream << std::hex << std::setfill('0') << std::setw(2) << buf[i] << " ";
+    return stream.str();
 }
 
 KnxConnection* Object::getKnxConnection()
@@ -3093,11 +3103,11 @@ void ObjectController::onWrite(eibaddr_t src, eibaddr_t dest, const uint8_t* buf
             << " sender=" << Object::WriteAddr( src ) << endlog;
     
     // Stefaan TODO Add call to buslisteners    
-    ListenerBusList_t::iterator it;
-    for (it = listenerBusList_m.begin(); it != listenerBusList_m.end(); it++)
+    ListenerBusList_t::iterator lbl;
+    for (lbl = listenerBusList_m.begin(); lbl != listenerBusList_m.end(); lbl++)
     {
         logger_m.debugStream() << "Calling onMessage on buslistener" << endlog;
-        (*it)->onMessage(src, dest, buf, len);
+        (*lbl)->onMessage(src, dest, buf, len);
     }
     
 }
