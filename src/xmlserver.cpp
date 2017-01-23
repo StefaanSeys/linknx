@@ -793,3 +793,8 @@ void ClientConnection::onChange(Object* object)
     sendmessage (msg.str(), NULL);
 }
 
+void ClientConnection::onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
+{
+    infoStream("ClientConnection::onMessage") << "Buslistener Called! msg length: " << len;    
+}
+

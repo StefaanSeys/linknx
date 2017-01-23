@@ -77,7 +77,7 @@ private:
     std::string path_m;
 };
 
-class ClientConnection : public Thread, public ChangeListener
+class ClientConnection : public Thread, public ChangeListener, public BusListener
 {
 public:
     ClientConnection (XmlServer *server, int fd);
@@ -99,6 +99,7 @@ public:
 
 
     virtual void onChange(Object* object);
+    virtual void onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len);
 
     std::string msg_m;
     std::string msgbuf_m;

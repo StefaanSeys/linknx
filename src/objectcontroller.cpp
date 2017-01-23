@@ -3091,6 +3091,7 @@ void ObjectController::onWrite(eibaddr_t src, eibaddr_t dest, const uint8_t* buf
         logger_m.debugStream() << "onWrite - dest eibaddr not found: "
             << Object::WriteGroupAddr(dest)
             << " sender=" << Object::WriteAddr( src ) << endlog;
+    // Stefaan TODO Add call to buslisteners    
 }
 
 void ObjectController::onRead(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
@@ -3104,6 +3105,7 @@ void ObjectController::onRead(eibaddr_t src, eibaddr_t dest, const uint8_t* buf,
         logger_m.debugStream() << "onRead - dest eibaddr not found: "
             << Object::WriteGroupAddr(dest)
             << " sender=" << Object::WriteAddr( src ) << endlog;
+    // Stefaan TODO Add call to buslisteners
 }
 
 void ObjectController::onResponse(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
@@ -3117,6 +3119,7 @@ void ObjectController::onResponse(eibaddr_t src, eibaddr_t dest, const uint8_t* 
         logger_m.debugStream() << "onResponse - dest eibaddr not found: "
             << Object::WriteGroupAddr(dest)
             << " sender=" << Object::WriteAddr( src ) << endlog;
+    // Stefaan TODO Add call to buslisteners
 }
 
 Object* ObjectController::getObject(const std::string& id)
@@ -3178,6 +3181,22 @@ void ObjectController::removeObject(Object* object)
         objectIdMap_m.erase(it);
     }
 }
+
+//Stefaan
+
+void ObjectController::addBusListener(BusListener* listener)
+{
+    logger_m.debugStream()  << "Adding buslistener to ObjectController" << endlog;
+    listenerBusList_m.push_back(listener);
+}
+void ObjectController::removeBusListener(BusListener* listener)
+{
+    logger_m.debugStream()  << "Removing buslistener from ObjectController" << endlog;
+    listenerBusList_m.remove(listener);
+}
+
+//end Stefaan
+
 
 void ObjectController::importXml(ticpp::Element* pConfig)
 {

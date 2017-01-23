@@ -32,6 +32,16 @@
 
 class Object;
 
+
+// Stefaan
+class BusListener
+{
+public:
+    virtual ~BusListener() {}:
+    virtual void onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len) = 0;
+};
+
+
 class ChangeListener
 {
 public:
@@ -141,7 +151,7 @@ private:
     typedef std::list<ChangeListener*> ListenerList_t;
     ListenerList_t listenerList_m;
     typedef std::list<eibaddr_t> ListenerGadList_t;
-    ListenerGadList_t listenerGadList_m;
+    ListenerGadList_t listenerGadList_m;    
 };
 
 class SwitchingObject : public Object
@@ -1307,6 +1317,10 @@ public:
     virtual void onResponse(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len);
     virtual std::list<Object*> getObjects();
 
+    //Stefaan
+    void addBusListener(BusListener* listener);
+    void removeBusListener(BusListener* listener);
+
 private:
     ObjectController();
     virtual ~ObjectController();
@@ -1321,6 +1335,9 @@ private:
     ObjectIdMap_t objectIdMap_m;
     static ObjectController* instance_m;
     static Logger& logger_m;
+    // Stefaan
+    typedef std::list<BusListener*> ListenerBusList_t;
+    ListenerBusList_t listenerBusList_m;
 };
 
 #endif
