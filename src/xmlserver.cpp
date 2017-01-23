@@ -201,6 +201,10 @@ ClientConnection::~ClientConnection ()
     notifyList_m.clear();
     if (server_m)
         server_m->deregister (this);
+    
+    // Stefaan
+    ObjectController::instance()->removeBusListener(this);
+    
     close (fd_m);
 }
 

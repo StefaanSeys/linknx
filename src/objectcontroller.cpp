@@ -3091,7 +3091,15 @@ void ObjectController::onWrite(eibaddr_t src, eibaddr_t dest, const uint8_t* buf
         logger_m.debugStream() << "onWrite - dest eibaddr not found: "
             << Object::WriteGroupAddr(dest)
             << " sender=" << Object::WriteAddr( src ) << endlog;
+    
     // Stefaan TODO Add call to buslisteners    
+    ListenerBusList_t::iterator it;
+    for (it = listenerBusList_m.begin(); it != listenerBusList_m.end(); it++)
+    {
+        logger_m.debugStream() << "Calling onMessage on buslistener" << endlog;
+        (*it)->onMessage(src, dest, buf, len);
+    }
+    
 }
 
 void ObjectController::onRead(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
