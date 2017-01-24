@@ -564,9 +564,29 @@ std::string Object::WriteAddr(eibaddr_t addr)
 std::string Object::WriteRawValue(const uint8_t* buf, int len)
 {
     std::stringstream stream;
-    for (int i = 0; i < len; ++i)
-        stream << std::hex << std::setfill('0') << std::setw(2) << (int)buf[i] << " ";
-    return stream.str();
+    stream << std::hex << std::setfill('0') << std::setw(2);
+    std::string v;
+
+    if (buf[1] & 0xC0)
+    {        
+        if (len == 2)
+        {
+            stream << (int)(buf[1] & 0x3F);
+            v = stream.str();
+        }
+        else
+        {
+            for (int i = 2; i < len; ++i)
+                stream << (int)buf[i] << " ";
+            v = stream.str();
+            v = v.substr(0, v.size()-1);
+        }
+    }
+
+    //for (int i = 0; i < len; ++i)
+    //    stream << std::hex << std::setfill('0') << std::setw(2) << (int)buf[i] << " ";
+    
+    return v;
 }
 
 KnxConnection* Object::getKnxConnection()

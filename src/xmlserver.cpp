@@ -804,5 +804,8 @@ void ClientConnection::onChange(Object* object)
 void ClientConnection::onMessage(eibaddr_t src, eibaddr_t dest, const uint8_t* buf, int len)
 {
     infoStream("ClientConnection::onMessage") << "Buslistener Called! From: " << Object::WriteAddr(src) << " To: " << Object::WriteGroupAddr(dest) << " Value: " << Object::WriteRawValue(buf, len);    
+    std::stringstream msg;
+    msg << "<busmonitor src='" << Object::WriteAddr(src) << "' dest='" << Object::WriteGroupAddr(dest) << "' value='" << Object::WriteRawValue(buf, len) << "'></busmonitor>" << std::endl;
+    sendmessage (msg.str(), NULL);
 }
 
